@@ -392,11 +392,13 @@ def main():
     num_steps = st.sidebar.slider(
         "#steps", min_value=0, max_value=1000, value=100, step=50
     )
-    batch_size = st.sidebar.slider("batch size", min_value=1, max_value=16, value=8)
-    lr = st.sidebar.slider("lr", min_value=0.01, max_value=0.10, value=0.07, step=0.01)
+    batch_size = st.sidebar.slider(
+        "batch size", min_value=4, max_value=32, value=8, step=4
+    )
+    lr = st.sidebar.slider("lr", min_value=0.00, max_value=0.20, value=0.07, step=0.01)
     prefix = st.sidebar.selectbox("prefix", ["An illustration of", "A photo of", ""])
 
-    st.sidebar.header("Loss")
+    st.sidebar.header("Normalization")
     lambda_tv = st.sidebar.slider("lambda_tv", min_value=0.0, max_value=0.1, value=0.01)
     lambda_l1 = st.sidebar.slider("lambda_l1", min_value=0.0, max_value=0.1, value=0.05)
 
