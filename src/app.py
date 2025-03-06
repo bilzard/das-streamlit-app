@@ -406,7 +406,7 @@ def main():
     batch_size = st.sidebar.slider(
         "batch size", min_value=4, max_value=32, value=8, step=4
     )
-    lr = st.sidebar.slider("lr", min_value=0.00, max_value=0.20, value=0.07, step=0.01)
+    lr = st.sidebar.slider("lr", min_value=0.00, max_value=0.40, value=0.20, step=0.05)
     prefix = st.sidebar.selectbox("prefix", ["An illustration of", "A photo of", ""])
 
     st.sidebar.header("Regularization")
