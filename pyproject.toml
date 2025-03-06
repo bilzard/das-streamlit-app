@@ -4,7 +4,10 @@ version = "0.1.0"
 description = ""
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = [
+dependencies = []
+
+[project.optional-dependencies]
+build = [
     "accelerate",
     "datasets",
     "deepspeed",
@@ -19,18 +22,28 @@ dependencies = [
     "tokenizers",
     "torch",
     "transformers[deepspeed]",
-    "xformers",
     "peft",
-    "trl",
     "huggingface_hub",
     "hf_transfer",
     "ipython>=8.32.0",
     "sentencepiece>=0.2.0",
     "protobuf>=5.29.3",
+    "setuptools>=75.8.2",
+    "streamlit>=1.43.0",
+    "torchvision>=0.21.0",
 ]
+compile = ["flash-attn"]
 
 [dependency-groups]
 dev = ["huggingface-hub[cli]>=0.29.1", "ipykernel>=6.29.5", "kaggle>=1.6.17"]
+
+[tool.uv]
+no-build-isolation-package = ["flash-attn"]
+
+[[tool.uv.dependency-metadata]]
+name="flash-attn"
+version = "2.7.4.post1"
+requires-dist=["torch", "einops"]
 
 [tool.uv.sources]
 torch = { index = "torch_cu124" }
