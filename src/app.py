@@ -404,16 +404,16 @@ def main():
         "#steps", min_value=0, max_value=100, value=50, step=10
     )
     batch_size = st.sidebar.slider(
-        "batch size", min_value=4, max_value=32, value=8, step=4
+        "batch size", min_value=4, max_value=32, value=16, step=4
     )
-    lr = st.sidebar.slider("lr", min_value=0.00, max_value=0.20, value=0.20, step=0.05)
+    lr = st.sidebar.slider("lr", min_value=0.00, max_value=0.20, value=0.15, step=0.05)
     prefix = st.sidebar.selectbox("prefix", ["An illustration of", "A photo of", ""])
 
     st.sidebar.header("Regularization")
     lambda_tv_exp = st.sidebar.slider(
         "lambda_tv_exp",
         min_value=-5,
-        max_value=-1,
+        max_value=0,
         value=-2,
     )
     lambda_tv = 10**lambda_tv_exp
