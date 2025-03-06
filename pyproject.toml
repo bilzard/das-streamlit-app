@@ -1,0 +1,84 @@
+[project]
+name = "src"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "accelerate",
+    "datasets",
+    "deepspeed",
+    "ipywidgets",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "polars",
+    "pyarrow",
+    "scikit-learn",
+    "scipy",
+    "tokenizers",
+    "torch",
+    "transformers[deepspeed]",
+    "xformers",
+    "peft",
+    "trl",
+    "huggingface_hub",
+    "hf_transfer",
+    "ipython>=8.32.0",
+    "sentencepiece>=0.2.0",
+    "protobuf>=5.29.3",
+]
+
+[dependency-groups]
+dev = ["huggingface-hub[cli]>=0.29.1", "ipykernel>=6.29.5", "kaggle>=1.6.17"]
+
+[tool.uv.sources]
+torch = { index = "torch_cu124" }
+
+[[tool.uv.index]]
+name = "torch_cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+[tool.ruff]
+extend-include = ["*.ipynb"]
+include = ["src", "notebook", "run"]
+exclude = [
+    ".venv",
+    "data",
+    "external",
+    "log",
+    "src/experimental",
+    "src/typestubs",
+    "**/node_modules",
+    "**/__pycache__",
+    "*.npy",
+    "*.parquet",
+    "*.csv",
+    "*.zip",
+    "*.pyi",
+]
+
+[tool.pyright]
+
+executionEnvironments = [
+    { root = "src", pythonVersion = "3.10", venv = ".venv" },
+]
+extend_exclude = ["*.ipynb"]
+include = ["src"]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    "data",
+    "src/experimental",
+    "src/typestubs",
+    "external",
+    "log",
+    ".venv",
+]
+ignore = []
+defineConstant = { "DEBUG" = true }
+venvPath = "."
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+stubPath = "src/stubs"
