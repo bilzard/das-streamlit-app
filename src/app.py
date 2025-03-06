@@ -266,6 +266,7 @@ class DasAttacker:
         self.checkpoints = []
         self.scores = []
         self.noise_schedule = noise_schedule_map[config.noise_schedule]
+        self.max_size = self.config.image_resolutions[-1]
         self._freeze()
 
     def _freeze(self):
@@ -288,7 +289,6 @@ class DasAttacker:
     def attack(self, progress_callback=None):
         cfg = self.config
         assert self.text_features is not None
-        size = cfg.image_resolutions[-1]
         image_stack = [
             (nn.Parameter(torch.randn(1, 3, s, s, device=self.device) / s))
             for s in cfg.image_resolutions
@@ -313,14 +313,16 @@ class DasAttacker:
                 end=cfg.color_shift_range[1],
             )
             image = torch.stack(
-                [interpolate(i, size, mode=self.mode) for i in image_stack]
+                [interpolate(i, self.max_size, mode=self.mode) for i in image_stack]
             ).mean(0)
             image = image.tanh()
             images = image.repeat(cfg.batch_size, 1, 1, 1)
             images = add_positional_rolling(images, max_shift=cfg.max_shift)
             images = color_shift(images, c_shift)
             images = gaussian_noise(images, sigma=noise_std)
-            if size != 384:
+            self.pad = pad = cfg.max_shift // 2
+            images = images[..., pad:-pad, pad:-pad]
+            if images.shape[-1] != 384:
                 images = interpolate(images, 384, mode=self.mode)
             outputs = self.model.vision_model(pixel_values=images)
             image_features = outputs.pooler_output
@@ -341,7 +343,7 @@ class DasAttacker:
                 images_list = []
                 image_tensor = torch.cat(
                     [
-                        interpolate(i.detach(), size, mode=self.mode).cpu()
+                        interpolate(i.detach(), self.max_size, mode=self.mode).cpu()
                         for i in image_stack
                     ]
                 )
@@ -354,9 +356,15 @@ class DasAttacker:
         gc.collect()
 
     def evaluate(self):
+        pad = self.pad
         with torch.no_grad():
             image = torch.stack(
-                [interpolate(i, 384, mode=self.mode) for i in self.image_stack]
+                [
+                    interpolate(i, self.max_size, mode=self.mode)[
+                        ..., pad:-pad, pad:-pad
+                    ]
+                    for i in self.image_stack
+                ]
             ).mean(0)
             image = image.tanh()
             image_np = inv_process(image)
@@ -366,6 +374,7 @@ class DasAttacker:
             return image_np, score
 
     def get_checkpoint_images(self):
+        pad = self.pad
         images = []
         with torch.no_grad():
             for idx, (checkpoint, score) in enumerate(
@@ -373,7 +382,9 @@ class DasAttacker:
             ):
                 img = torch.cat(
                     [
-                        interpolate(i.unsqueeze(0), 384, mode=self.mode)
+                        interpolate(i.unsqueeze(0), 384, mode=self.mode)[
+                            ..., pad:-pad, pad:-pad
+                        ]
                         for i in checkpoint
                     ]
                 ).mean(0)
@@ -414,9 +425,6 @@ def main():
         "decay_rate", min_value=0.1, max_value=1.0, value=0.8, step=0.1
     )
     st.sidebar.subheader("Positional Jitter")
-    max_shift = st.sidebar.slider(
-        "max_shift", min_value=0, max_value=128, value=64, step=16
-    )
     st.sidebar.subheader("Color Shift")
     color_shift_range = st.sidebar.slider(
         "Color Shift Range", min_value=0.0, max_value=1.0, value=(0.05, 0.10), step=0.05
@@ -428,7 +436,6 @@ def main():
         lambda_tv=lambda_tv,
         lambda_l1=lambda_l1,
         lr=lr,
-        max_shift=max_shift,
         checkpoint_interval=num_steps,
         noise_schedule=noise_schedule,
         noise_std_range=noise_stds,
