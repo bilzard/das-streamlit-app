@@ -409,7 +409,7 @@ def main():
     lr = st.sidebar.slider("lr", min_value=0.00, max_value=0.20, value=0.07, step=0.01)
     prefix = st.sidebar.selectbox("prefix", ["An illustration of", "A photo of", ""])
 
-    st.sidebar.header("Normalization")
+    st.sidebar.header("Regularization")
     lambda_tv = st.sidebar.slider("lambda_tv", min_value=0.0, max_value=0.1, value=0.01)
     lambda_l1 = st.sidebar.slider("lambda_l1", min_value=0.0, max_value=0.1, value=0.05)
 
