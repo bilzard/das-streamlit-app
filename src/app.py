@@ -401,7 +401,7 @@ def main():
 
     st.sidebar.header("Parameters")
     num_steps = st.sidebar.slider(
-        "#steps", min_value=0, max_value=1000, value=100, step=50
+        "#steps", min_value=0, max_value=100, value=50, step=10
     )
     batch_size = st.sidebar.slider(
         "batch size", min_value=4, max_value=32, value=8, step=4
