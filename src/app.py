@@ -447,12 +447,7 @@ def main():
         "Gigantic metallic Mona Lisa attacking the city",
         "Gamma-ray burst into gigantic Tokyo tower in the last day of Earth",
         "A beautiful Mt. Fuji, a hawk, and an eggplant, in a cyber-punk Tokyo",
-        "A rusty chain interwoven with a steal skull in the dark night, pink stars are shining all around the purple sky",
-        "Five rainbow-colored beetles gathering to the honey spot in the calm, hot, humid night",
-        "Sphere of mercury glows and swarm, in the ominous cradle of fear",
-        "Futuristic cybernetic omega-3 fatty acid particles, illuminated by neon-blue ray tracing reflections in a dark void, creating a sci-fi molecular landscape",
-        "Overdose of love, a miserable lonely machine in the old world",
-        "Howl of a grayish beast in the dusk of heavy groovy night",
+        "A cute Japanese anime Geisha girl wearing a rainbow-colored kimono, facing to dark curtains crying with huge drops of tears",
     ]
     selected_sample = st.radio("Choose a sample prompt:", sample_prompts, index=None)
     prompt = st.text_area(
