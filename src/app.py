@@ -453,7 +453,7 @@ def main():
         "Color Suppression (L1)",
         min_value=0.0,
         max_value=0.5,
-        value=0.05,
+        value=0.10,
         step=0.05,
         help="higher value suppresses color and increases grayness",
     )
