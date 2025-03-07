@@ -429,26 +429,34 @@ def main():
 
     st.sidebar.header("Regularization")
     lambda_tv_exp = st.sidebar.slider(
-        "lambda_tv_exp",
+        "Texture Suppression (TV)",
         min_value=-5,
         max_value=0,
         value=-2,
     )
     lambda_tv = 10**lambda_tv_exp
     lambda_l1 = st.sidebar.slider(
-        "lambda_l1", min_value=0.0, max_value=0.5, value=0.05, step=0.05
+        "Color Suppression (L1)",
+        min_value=0.0,
+        max_value=0.5,
+        value=0.05,
+        step=0.05,
     )
 
     st.sidebar.header("Augmentation")
     st.sidebar.subheader("Gaussian Noise")
     noise_schedule = st.sidebar.selectbox(
-        "noise_schedule", ["linear", "exponential", "cosine"], index=1
+        "Noise Schedule", ["linear", "exponential", "cosine"], index=1
     )
     noise_stds = st.sidebar.slider(
-        "Noise Std Dev Range", min_value=0.0, max_value=1.0, value=(0.1, 0.5), step=0.05
+        "Noise Intensity Range",
+        min_value=0.0,
+        max_value=1.0,
+        value=(0.1, 0.5),
+        step=0.05,
     )
     decay_rate = st.sidebar.slider(
-        "decay_rate", min_value=0.1, max_value=1.0, value=0.8, step=0.1
+        "Noise Decay Rate", min_value=0.1, max_value=1.0, value=0.8, step=0.1
     )
     st.sidebar.subheader("Positional Jitter")
     st.sidebar.subheader("Color Shift")
