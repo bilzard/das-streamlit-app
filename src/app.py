@@ -414,15 +414,24 @@ def main():
 
     st.sidebar.header("Parameters")
     num_steps = st.sidebar.slider(
-        "#steps", min_value=0, max_value=100, value=50, step=10
+        "#steps", min_value=0, max_value=100, value=100, step=10
     )
     batch_size = st.sidebar.slider(
-        "batch size", min_value=8, max_value=32, value=16, step=8
+        "batch size", min_value=8, max_value=32, value=8, step=8
     )
-    lr = st.sidebar.slider("lr", min_value=0.00, max_value=0.20, value=0.15, step=0.05)
+    lr = st.sidebar.slider("lr", min_value=0.00, max_value=0.20, value=0.10, step=0.05)
 
     st.sidebar.header("Generation")
-    prefix = st.sidebar.selectbox("prefix", ["An illustration of", "A photo of", ""])
+    prefix = st.sidebar.selectbox(
+        "prefix",
+        [
+            "A hyper-realistic illustration of",
+            "A hyper-realistic photo of",
+            "An illustration of",
+            "A photo of",
+            "",
+        ],
+    )
 
     use_deterministic_algorithm = (
         st.sidebar.checkbox(
@@ -445,7 +454,7 @@ def main():
         "Texture Suppression (TV)",
         min_value=-5,
         max_value=0,
-        value=-2,
+        value=-3,
         help="higher value suppresses texture and increases smoothness",
     )
     lambda_tv = 10**lambda_tv_exp
@@ -496,7 +505,7 @@ def main():
     )
 
     sample_prompts = [
-        "A gigantic metallic Mona Lisa attacking the city, grinning cruelly, as guns are firing all around",
+        "A gigantic metallic Mona Lisa attacking the city",
         "A massive gamma-ray burst engulfs the towering Tokyo Tower on Earth's final day",
         "A stunning Mount Fuji, a majestic hawk, and a symbolic eggplant, set against the neon-lit skyline of cyberpunk Tokyo",
         "A cute Japanese anime Geisha girl wearing a rainbow-colored kimono, facing to dark curtains crying with huge drops of tears",
@@ -506,7 +515,7 @@ def main():
         "Enter your prompt:",
         value=selected_sample if selected_sample else sample_prompts[0],
     )
-    final_prompt = f"{prefix} {prompt}".strip()
+    final_prompt = f'{prefix} "{prompt}"'.strip()
 
     if st.button("Generate Image"):
         st.write(f"**Final Prompt**: `{final_prompt}`")
