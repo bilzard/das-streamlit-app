@@ -469,9 +469,9 @@ def main():
     )
 
     sample_prompts = [
-        "Gigantic metallic Mona Lisa attacking the city",
-        "Gamma-ray burst into gigantic Tokyo tower in the last day of Earth",
-        "A beautiful Mt. Fuji, a hawk, and an eggplant, in a cyber-punk Tokyo",
+        "A gigantic metallic Mona Lisa attacking the city, grinning cruelly, as guns are firing all around",
+        "A massive gamma-ray burst engulfs the towering Tokyo Tower on Earth's final day",
+        "A stunning Mount Fuji, a majestic hawk, and a symbolic eggplant, set against the neon-lit skyline of cyberpunk Tokyo",
         "A cute Japanese anime Geisha girl wearing a rainbow-colored kimono, facing to dark curtains crying with huge drops of tears",
     ]
     selected_sample = st.radio("Choose a sample prompt:", sample_prompts, index=None)
