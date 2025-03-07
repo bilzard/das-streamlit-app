@@ -82,17 +82,21 @@ It took around **18 sec/image** for my environment.
 
 ## Art Gallery
 
-prompt: `An illustration of Gigantic metallic Mona Lisa attacking the city`
+**prompt**: `A photorealistic illustration of a gigantic metallic Mona Lisa in red pajama attacking the city in an impressionist painting style`
 
-![Image](https://github.com/user-attachments/assets/f248c514-315c-4509-9d4c-fa928a9f9b1a)
+![Image](https://github.com/user-attachments/assets/58f2a0f4-b04b-4ef5-9317-ba8e6a29a248)
 
-prompt: `A photo of Gamma-ray burst into gigantic Tokyo tower in the last day of Earth`
+**prompt**: `A photorealistic illustration of a massive gamma-ray burst engulfs the towering Tokyo Tower on Earth's final day, in a cyberpunk style`
 
-![Image](https://github.com/user-attachments/assets/ca9ac520-2a74-479f-a100-97b0e595cb38)
+![Image](https://github.com/user-attachments/assets/811872ae-5150-4288-be74-677e1a2b9d7f)
 
-prompt `A photo of A beautiful Mt. Fuji, a hawk, and an eggplant, in a cyber-punk Tokyo`
+**prompt**: `A photorealistic illustration of a stunning Mount Fuji, a majestic hawk, and a symbolic eggplant, set against the neon-lit skyline of cyberpunk Tokyo, in a cyberpunk style`
 
-![Image](https://github.com/user-attachments/assets/d634a7bc-0417-4d98-9ba9-e4043db3245c)
+![Image](https://github.com/user-attachments/assets/5cdb3826-38f1-4b9a-8d1b-df521c0479bc)
+
+**prompt**: `A beautifully detailed illustration of a cute Japanese Geisha girl wearing a rainbow-colored kimono, crying with huge drops of tears, in a vibrant comic book style`
+
+![Image](https://github.com/user-attachments/assets/6fa8b2ce-73d3-40f8-aec5-5a528c4a9339)
 
 ## Reference
 
