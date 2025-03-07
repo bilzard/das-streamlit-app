@@ -435,7 +435,9 @@ def main():
         value=-2,
     )
     lambda_tv = 10**lambda_tv_exp
-    lambda_l1 = st.sidebar.slider("lambda_l1", min_value=0.0, max_value=0.1, value=0.05)
+    lambda_l1 = st.sidebar.slider(
+        "lambda_l1", min_value=0.0, max_value=0.5, value=0.05, step=0.05
+    )
 
     st.sidebar.header("Augmentation")
     st.sidebar.subheader("Gaussian Noise")
