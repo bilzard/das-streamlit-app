@@ -8,7 +8,7 @@ It provides an interactive UI for granular parameter tuning, allowing users to e
 
 ## Screenshot
 
-![Image](https://github.com/user-attachments/assets/6798c262-c89c-4a11-b047-a1f4128cfef6)
+![Image](https://github.com/user-attachments/assets/ff188ea3-0f5a-4dc6-96a1-ef271f53f4a6)
 
 ## About DAS
 
