@@ -422,17 +422,6 @@ def main():
     lr = st.sidebar.slider("lr", min_value=0.00, max_value=0.20, value=0.10, step=0.05)
 
     st.sidebar.header("Generation")
-    prefix = st.sidebar.selectbox(
-        "prefix",
-        [
-            "A hyper-realistic illustration of",
-            "A hyper-realistic photo of",
-            "An illustration of",
-            "A photo of",
-            "",
-        ],
-    )
-
     use_deterministic_algorithm = (
         st.sidebar.checkbox(
             "Use Deterministic Algorithm",
@@ -505,20 +494,19 @@ def main():
     )
 
     sample_prompts = [
-        "A gigantic metallic Mona Lisa attacking the city",
-        "A massive gamma-ray burst engulfs the towering Tokyo Tower on Earth's final day",
-        "A stunning Mount Fuji, a majestic hawk, and a symbolic eggplant, set against the neon-lit skyline of cyberpunk Tokyo",
-        "A cute Japanese anime Geisha girl wearing a rainbow-colored kimono, facing to dark curtains crying with huge drops of tears",
+        "A photorealistic sci-fi illustration of a gigantic metallic Mona Lisa attacking the city",
+        "A photorealistic sci-fi illustration of a massive gamma-ray burst engulfs the towering Tokyo Tower on Earth's final day",
+        "A photorealistic sci-fi illustration of a stunning Mount Fuji, a majestic hawk, and a symbolic eggplant, set against the neon-lit skyline of cyberpunk Tokyo",
+        "A beautifully detailed anime-style illustration of a cute Japanese Geisha girl wearing a rainbow-colored kimono, crying with huge drops of tears",
     ]
     selected_sample = st.radio("Choose a sample prompt:", sample_prompts, index=None)
     prompt = st.text_area(
         "Enter your prompt:",
         value=selected_sample if selected_sample else sample_prompts[0],
     )
-    final_prompt = f'{prefix} "{prompt}"'.strip()
 
     if st.button("Generate Image"):
-        st.write(f"**Final Prompt**: `{final_prompt}`")
+        st.write(f"**Prompt**: `{prompt}`")
 
         st.write("Generating Image...")
         if set_seed:
@@ -527,7 +515,7 @@ def main():
                 use_deterministic_algorithm=cfg.use_deterministic_algorithm,
             )
         attacker = DasAttacker(model_path=MODEL_PATH, config=cfg)
-        attacker.cache_positive_text_embeddings([final_prompt])
+        attacker.cache_positive_text_embeddings([prompt])
 
         progress_bar = st.progress(0)
         status_text = st.empty()
