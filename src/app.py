@@ -1,8 +1,10 @@
 import gc
 import math
+import random
 from dataclasses import dataclass, field
 from typing import Any
 
+import numpy as np
 import streamlit as st
 import torch
 import torch.nn as nn
@@ -14,6 +16,20 @@ import torchvision.transforms.v2.functional as F2
 from transformers import AutoModel, AutoProcessor
 
 MODEL_PATH = "/ml-docker/input/hf/google/siglip-so400m-patch14-384"
+
+
+def seed_everything(seed: int = 42):
+    """Set the same seed for reproducibility across random, numpy, and PyTorch."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+# シードを設定
+seed_everything(123)
 
 
 def resize_image(image, target_size, mode="bicubic"):
@@ -241,6 +257,7 @@ class Config:
     image_resolutions: tuple[int, ...] = (1, 2, 4, 8, 16, 32, 64, 128, 256, 512)
     checkpoint_interval: int = 100
     mode: str = "bicubic"
+    seed: int = 42
 
 
 noise_schedule_map = {
@@ -400,6 +417,7 @@ def main():
     st.title("Demo: Direct Ascent Synthesis (DAS)")
 
     st.sidebar.header("Parameters")
+    seed = st.sidebar.number_input("seed", value=42, step=1)
     num_steps = st.sidebar.slider(
         "#steps", min_value=0, max_value=100, value=50, step=10
     )
@@ -447,6 +465,7 @@ def main():
         noise_std_range=noise_stds,
         noise_schedule_params={"decay_rate": decay_rate},
         color_shift_range=color_shift_range,
+        seed=seed,
     )
 
     sample_prompts = [
@@ -466,6 +485,7 @@ def main():
         st.write(f"**Final Prompt**: `{final_prompt}`")
 
         st.write("Generating Image...")
+        # seed_everything(config.seed) # TODO: 再現性がない...
         attacker = DasAttacker(model_path=MODEL_PATH, config=config)
         attacker.cache_positive_text_embeddings([final_prompt])
 
