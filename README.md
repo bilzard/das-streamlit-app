@@ -63,6 +63,15 @@ MODEL_PATH = "/ml-docker/input/hf"
 uv run streamlit run src/app.py
 ```
 
+**Experimental**: If set `CUBLAS_WORKSPACE_CONFIG` environment variable, it uses deterministic algorithm. Note that it **does not ensure reproducibility**, and it **may limit overall performance**.
+Please refer to https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility for more detail.
+
+```bash
+CUBLAS_WORKSPACE_CONFIG=:4096:8 uv run streamlit run src/app.py
+# or
+CUBLAS_WORKSPACE_CONFIG=:16:8 uv run streamlit run src/app.py
+```
+
 ## How To Generate
 
 1. adjust parameter (however, initial parameter should be fine).

@@ -1,5 +1,6 @@
 import gc
 import math
+import os
 import random
 from dataclasses import dataclass, field
 from typing import Any
@@ -18,7 +19,14 @@ from transformers import AutoModel, AutoProcessor
 MODEL_PATH = "/ml-docker/input/hf/google/siglip-so400m-patch14-384"
 
 
-def seed_everything(seed: int = 42):
+def is_deterministic_algorithm_enabled():
+    return (
+        os.environ.get("CUBLAS_WORKSPACE_CONFIG", "") == ":4096:8"
+        or os.environ.get("CUBLAS_WORKSPACE_CONFIG", "") == ":16:8"
+    )
+
+
+def seed_everything(seed: int = 42, use_deterministic_algorithm: bool = False):
     """Set the same seed for reproducibility across random, numpy, and PyTorch."""
     random.seed(seed)
     np.random.seed(seed)
@@ -26,20 +34,7 @@ def seed_everything(seed: int = 42):
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-
-
-# シードを設定
-seed_everything(123)
-
-
-def resize_image(image, target_size, mode="bicubic"):
-    mode_ = (
-        T.InterpolationMode.BICUBIC
-        if mode == "bicubic"
-        else T.InterpolationMode.NEAREST
-    )
-    transform = T.Resize((target_size, target_size), interpolation=mode_)
-    return transform(image)
+    torch.use_deterministic_algorithms(use_deterministic_algorithm)
 
 
 def interpolate(image, target_size, mode="bicubic"):
@@ -47,7 +42,7 @@ def interpolate(image, target_size, mode="bicubic"):
         image,
         size=(target_size, target_size),
         mode=mode,
-        **({"align_corners": False} if mode == "bicubic" else {}),
+        **({"align_corners": False} if mode == "bicubic" or mode == "bilinear" else {}),
     )
 
 
@@ -102,11 +97,11 @@ def color_shift(image, shift: float = 1.0):
     :return: Color Shift された画像
     """
     N, C, H, W = image.shape
-    mu = torch.empty((N, C, 1, 1), device=image.device).uniform_(
+    mu = torch.zeros((N, C, 1, 1), device=image.device).uniform_(
         -shift, shift
     )  # U[-1,1]
     sigma = torch.exp(
-        torch.empty((N, C, 1, 1), device=image.device).uniform_(-shift, shift)
+        torch.zeros((N, C, 1, 1), device=image.device).uniform_(-shift, shift)
     )  # exp(U[-1,1])
 
     return sigma * image + mu  # カラースケール & シフト
@@ -256,8 +251,9 @@ class Config:
     color_shift_range: tuple[float, float] = (1.0, 0.1)
     image_resolutions: tuple[int, ...] = (1, 2, 4, 8, 16, 32, 64, 128, 256, 512)
     checkpoint_interval: int = 100
-    mode: str = "bicubic"
+    mode: str = "bilinear"
     seed: int = 42
+    use_deterministic_algorithm: bool = False
 
 
 noise_schedule_map = {
@@ -417,15 +413,32 @@ def main():
     st.title("Demo: Direct Ascent Synthesis (DAS)")
 
     st.sidebar.header("Parameters")
-    seed = st.sidebar.number_input("seed", value=42, step=1)
     num_steps = st.sidebar.slider(
         "#steps", min_value=0, max_value=100, value=50, step=10
     )
     batch_size = st.sidebar.slider(
-        "batch size", min_value=4, max_value=32, value=16, step=4
+        "batch size", min_value=8, max_value=32, value=16, step=8
     )
     lr = st.sidebar.slider("lr", min_value=0.00, max_value=0.20, value=0.15, step=0.05)
+
+    st.sidebar.header("Generation")
     prefix = st.sidebar.selectbox("prefix", ["An illustration of", "A photo of", ""])
+
+    use_deterministic_algorithm = (
+        st.sidebar.checkbox(
+            "Use Deterministic Algorithm",
+            value=False,
+            help="**Note**: it does not ensure reproducibility and it becomes slower",
+        )
+        if is_deterministic_algorithm_enabled()
+        else False
+    )
+    interpolation_mode = st.sidebar.selectbox(
+        "Interpolation Mode",
+        ["bilinear", "bicubic"] if not use_deterministic_algorithm else ["bilinear"],
+    )
+    set_seed = st.sidebar.checkbox("Set Seed", value=False)
+    seed = st.sidebar.number_input("seed", value=42, step=1, disabled=not set_seed)
 
     st.sidebar.header("Regularization")
     lambda_tv_exp = st.sidebar.slider(
@@ -433,6 +446,7 @@ def main():
         min_value=-5,
         max_value=0,
         value=-2,
+        help="higher value suppresses texture and increases smoothness",
     )
     lambda_tv = 10**lambda_tv_exp
     lambda_l1 = st.sidebar.slider(
@@ -441,6 +455,7 @@ def main():
         max_value=0.5,
         value=0.05,
         step=0.05,
+        help="higher value suppresses color and increases grayness",
     )
 
     st.sidebar.header("Augmentation")
@@ -464,7 +479,7 @@ def main():
         "Color Shift Range", min_value=0.0, max_value=1.0, value=(0.05, 0.10), step=0.05
     )
 
-    config = Config(
+    cfg = Config(
         num_steps=num_steps,
         batch_size=batch_size,
         lambda_tv=lambda_tv,
@@ -476,6 +491,8 @@ def main():
         noise_schedule_params={"decay_rate": decay_rate},
         color_shift_range=color_shift_range,
         seed=seed,
+        mode=interpolation_mode,
+        use_deterministic_algorithm=use_deterministic_algorithm,
     )
 
     sample_prompts = [
@@ -495,8 +512,12 @@ def main():
         st.write(f"**Final Prompt**: `{final_prompt}`")
 
         st.write("Generating Image...")
-        # seed_everything(config.seed) # TODO: 再現性がない...
-        attacker = DasAttacker(model_path=MODEL_PATH, config=config)
+        if set_seed:
+            seed_everything(
+                cfg.seed,
+                use_deterministic_algorithm=cfg.use_deterministic_algorithm,
+            )
+        attacker = DasAttacker(model_path=MODEL_PATH, config=cfg)
         attacker.cache_positive_text_embeddings([final_prompt])
 
         progress_bar = st.progress(0)
